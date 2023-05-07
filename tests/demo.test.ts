@@ -26,7 +26,7 @@ test('chrome api events', () => {
 test('chrome api functions', () => {
   const manifest = {
     name: 'my chrome extension',
-    manifest_version: 2,
+    manifest_version: 3,
     version: '1.0.0',
   }
 
@@ -36,66 +36,14 @@ test('chrome api functions', () => {
   expect(chrome.runtime.getManifest).toBeCalled()
 })
 
-test('chrome api functions with callback', () => {
+test('chrome api functions with Promises', async () => {
   const message = { greeting: 'hello?' }
-  const response = { greeting: 'here I am' }
-  const callbackSpy = jest.fn()
 
-  chrome.runtime.sendMessage.mockImplementation(
-    (message, callback) => {
-      callback(response)
-    },
+  chrome.runtime.sendMessage.mockImplementation((msg) =>
+    Promise.resolve(msg),
   )
 
-  chrome.runtime.sendMessage(message, callbackSpy)
+  chrome.runtime.sendMessage(message)
 
-  expect(chrome.runtime.sendMessage).toBeCalledWith(
-    message,
-    callbackSpy,
-  )
-  expect(callbackSpy).toBeCalledWith(response)
-})
-
-test('chrome api functions with lastError', () => {
-  const message = { greeting: 'hello?' }
-  const response = { greeting: 'here I am' }
-
-  // lastError setup
-  const lastErrorMessage = 'this is an error'
-  const lastErrorGetter = jest.fn(() => lastErrorMessage)
-  const lastError = {
-    get message() {
-      return lastErrorGetter()
-    },
-  }
-
-  // mock implementation
-  chrome.runtime.sendMessage.mockImplementation(
-    (message, callback) => {
-      chrome.runtime.lastError = lastError
-
-      callback(response)
-
-      // lastError is undefined outside of a callback
-      delete chrome.runtime.lastError
-    },
-  )
-
-  // callback implementation
-  const lastErrorSpy = jest.fn()
-  const callbackSpy = jest.fn(() => {
-    if (chrome.runtime.lastError) {
-      lastErrorSpy(chrome.runtime.lastError.message)
-    }
-  })
-
-  // send a message
-  chrome.runtime.sendMessage(message, callbackSpy)
-
-  expect(callbackSpy).toBeCalledWith(response)
-  expect(lastErrorGetter).toBeCalled()
-  expect(lastErrorSpy).toBeCalledWith(lastErrorMessage)
-
-  // lastError has been cleared
-  expect(chrome.runtime.lastError).toBeUndefined()
+  expect(chrome.runtime.sendMessage).toBeCalledWith(message)
 })

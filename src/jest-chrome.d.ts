@@ -7424,7 +7424,9 @@ export namespace Runtime {
    *
    * @returns The manifest details.
    */
-  export const getManifest: jest.MockedFunction<typeof chrome.runtime.getManifest>
+  export const getManifest: jest.MockedFunction<
+    typeof chrome.runtime.getManifest | undefined
+  >
 
   /**
    * Returns a DirectoryEntry for the package directory.
