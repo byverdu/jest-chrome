@@ -37,7 +37,7 @@
     "start": "run-p build:watch",
     "pretest": "npm run build",
     "test": "jest",
-    "postinstall": "pnpm run build"
+    "postinstall": "pnpm i && pnpm run build"
   },
   "dependencies": {
     "@types/chrome": "^0.0.235"
